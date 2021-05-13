@@ -40,7 +40,7 @@ let dictionaryOfQuestions = {
 
 // ADD QUESTION
 
-function addQuestion() {
+function createQuestion() {
     let questionText = prompt('Введите текст вопроса', '');
     if (questionText) {
         return questionText;
@@ -49,7 +49,7 @@ function addQuestion() {
     return false;
 }
 
-function createAnswerOption() {
+function createResponseOption() {
     let answerOptionArray = [];
     while (questionNumber++ < 4) {
         let answerOptionText = prompt(`Введите текст ${questionNumber} варинта ответа`, '');
@@ -107,7 +107,7 @@ function checkRightAnswer(rightAnswerString) {
     return correctAnswerNumbers;
 }
 
-function createFullQuestion(questionText, answerOptionArray, correctAnswerNumbers) {
+function createСompleteQuestion(questionText, answerOptionArray, correctAnswerNumbers) {
     answerOptionArray.push(correctAnswerNumbers)
     dictionaryOfQuestions[questionText] = answerOptionArray;
 }
@@ -255,11 +255,11 @@ function startTest() {
 }
 
 function mainAddQuestion() {
-    let questionText = addQuestion();
+    let questionText = createQuestion();
     if (!questionText) {
         return false;
     }
-    let answerOptionArray = createAnswerOption();
+    let answerOptionArray = createResponseOption();
     if (!answerOptionArray) {
         return false;
     }
@@ -267,7 +267,7 @@ function mainAddQuestion() {
     if (!correctAnswerNumbers) {
         return false;
     }
-    createFullQuestion(questionText, answerOptionArray, correctAnswerNumbers);
+    createСompleteQuestion(questionText, answerOptionArray, correctAnswerNumbers);
 }
 
 function checkResult() {
