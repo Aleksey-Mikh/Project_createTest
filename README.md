@@ -5,3 +5,5 @@
 к проекту
 
 Проект выполнен с ипользованием JavaScript, HTML5 и Bootstrap для Frontend
+
+[Apache License Version 2.0](LICENSE "LICENSE")
