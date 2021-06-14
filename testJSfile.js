@@ -1,4 +1,3 @@
-let questionNumber = 0;
 let rightArray = [1, 2, 3, 4]
 let dictionaryOfQuestions = {
     'Какое из нижеперечисленных высказываний не является логическим?': [
@@ -38,30 +37,66 @@ let dictionaryOfQuestions = {
         ],
 }
 
-// ADD QUESTION
+const buttonStyle = "btn btn-primary"
+
+
+// Alert
+
+function allAlert(CCNumber, errorDictionary) {
+    switch(CCNumber) {
+        case 'CC1':
+            alert("Вы не ввели текст вопроса. Попробуйте добавить вопрос заново.");
+            break;
+        case 'CC2':
+            alert(`Вы не ввели текст ${errorDictionary.responseNumber} варианта ответа. Попробуйте добавить вопрос заново.`);
+            break;
+        case 'CC3':
+            alert("Вы не ввели правильные варианты ответов. Попробуйте добавить вопрос заново.");
+            break;
+        case 'CC4':
+            alert("Все вопросы должны иметь хотя бы один выбранный вариант ответа. Проверьте правильность заполнения.");
+            break;
+        case 'CC5':
+            alert(`Ваш результат ${errorDictionary.userFinalResult} из ${errorDictionary.maxFinalResult}. Вы молодец!`);
+            break;
+        case 'CC6':
+            alert("Поле может содержать только уникальные цифры 1, 2, 3, 4, разделенные запятой. Попробуйте добавить вопрос заново.");
+            break;
+        case 'CC7':
+            alert(
+                `Вы не правильно ответили на вопросы:
+                \n${errorDictionary.tracebackAlert}\nВаш результат ${errorDictionary.userFinalResult} из ${errorDictionary.maxFinalResult}`
+                 );
+            break;
+    }
+}
+
+// Add Question
 
 function createQuestion() {
     let questionText = prompt('Введите текст вопроса', '');
     if (questionText) {
         return questionText;
     }
-    alert('Вы не ввели текст вопроса. Попробуйте добавить вопрос заново.');
+    allAlert('CC1');
     return false;
 }
 
 function createResponseOption() {
     let answerOptionArray = [];
-    while (questionNumber++ < 4) {
-        let answerOptionText = prompt(`Введите текст ${questionNumber} варинта ответа`, '');
+    responseNumber = 0;
+    while (responseNumber++ < 4) {
+        let answerOptionText = prompt(`Введите текст ${responseNumber} варинта ответа`, '');
         if (answerOptionText) {
             answerOptionArray.push(answerOptionText);
         } else {
-            alert(`Вы не ввели текст ${questionNumber} варианта ответа. Попробуйте добавить вопрос заново.`);
-            questionNumber = 0;
+            let errorDictionary = {
+                "responseNumber": responseNumber
+            }
+            allAlert('CC2', errorDictionary)
             return false;
         }
     }
-    questionNumber = 0;
     return answerOptionArray;
 }
 
@@ -72,10 +107,10 @@ function createRightAnswer() {
         if (checkAnswer) {
             return checkAnswer;
         }
-        alert('Поле может содержать только уникальные цифры 1, 2, 3, 4, разделенные запятой. Попробуйте добавить вопрос заново.');
+        allAlert('CC6');
         return false;
     }
-    alert('Вы не ввели правильные варианты ответов. Попробуйте добавить вопрос заново.')
+    allAlert('CC3');
     return false; 
 }
 
@@ -112,7 +147,7 @@ function createСompleteQuestion(questionText, answerOptionArray, correctAnswerN
     dictionaryOfQuestions[questionText] = answerOptionArray;
 }
 
-// START TEST
+// Start Test
 
 function createOptionCheckbox(numberQuestion, optionNumber) {
     let checkbox = document.createElement("input");
@@ -122,7 +157,7 @@ function createOptionCheckbox(numberQuestion, optionNumber) {
     return checkbox;
 }
 
-function createLabelQuestion(question, numberQuestion) {
+function createTitleQuestion(question, numberQuestion) {
     let fullQuestion = `${numberQuestion}. ${question}`
     let labelQuestion = document.createElement("label");
     let textLabel = document.createTextNode(fullQuestion);
@@ -132,27 +167,33 @@ function createLabelQuestion(question, numberQuestion) {
     return labelQuestion;
 }
 
-function createlabelOption(optionArray) {
+function createTitleOption(optionArray) {
     let labelOption = document.createElement("label");
     let textLabel = document.createTextNode(optionArray);
     labelOption.appendChild(textLabel);
     return labelOption;
 }
 
-function createButton() {
+
+function createButton(label, onclick, id) {
     let button = document.createElement("button");
-    let textLabel = document.createTextNode('Отправить');
+    let textLabel = document.createTextNode(label);
     button.appendChild(textLabel);
-    button.onclick = checkResult;
+    button.className = buttonStyle;
+    button.onclick = onclick;
+    button.id = id;
     return button;
 }
 
-function addButton() {
-    let button = createButton();
+function addFinalButton() {
+    let label = "Отправить"
+    let onclick = checkResult
+    let id = "checkResult"
+    let button = createButton(label, onclick, id);
     document.body.append(button)
 }
 
-function getInformationQuestion() {
+function getQuestionFromDictionary() {
     let numberQuestion = 1;
     for (let key in dictionaryOfQuestions) {
         let question = key;
@@ -160,16 +201,15 @@ function getInformationQuestion() {
         createOutputTask(question, optionArray, numberQuestion);
         numberQuestion++;
     }
-    addButton();
 }
 
 function createOutputTask(question, optionArray, numberQuestion) {
-    let labelQuestion = createLabelQuestion(question, numberQuestion);
+    let labelQuestion = createTitleQuestion(question, numberQuestion);
     let ul = document.createElement("ul");
     document.body.append(labelQuestion)
     for (let i = 0; i < 4; i++) {
         let li = document.createElement("li");
-        let labelOption = createlabelOption(optionArray[i]);
+        let labelOption = createTitleOption(optionArray[i]);
         let optionCheckbox = createOptionCheckbox(numberQuestion, i);
         li.append(optionCheckbox, labelOption)
         ul.append(li)
@@ -178,11 +218,11 @@ function createOutputTask(question, optionArray, numberQuestion) {
 }
 
 function disabledButton() {
-    document.getElementById("addQuestionbutton").disabled = true;
-    document.getElementById("startTestbutton").disabled = true;
+    document.getElementById("mainAddQuestion").disabled = true;
+    document.getElementById("startTest").disabled = true;
 }
 
-// CHECK TEST RESULT
+// Check Test Result
 
 function getCheckboxResult() {
     let tracebackArray = []
@@ -198,12 +238,12 @@ function getCheckboxResult() {
             }
         }
         if (!generalStatus.includes(true)) {
-            alert('Все вопросы должны иметь хотя бы один выбранный вариант ответа. Проверьте правильность заполнения.')
+            allAlert('CC4')
             return false;
         }
         checkUserAnswer(numberQuestion, generalStatus, tracebackArray)
     }
-    return countingTheResult(tracebackArray);
+    return formingTheResult(tracebackArray);
 }
 
 function checkUserAnswer(numberQuestion, generalStatus, tracebackArray) {
@@ -224,13 +264,13 @@ function checkUserAnswer(numberQuestion, generalStatus, tracebackArray) {
     }
 }
 
-function countingTheResult(tracebackArray) {
+function formingTheResult(tracebackArray) {
     let tracebackAlert = '';
     let maxFinalResult = Object.keys(dictionaryOfQuestions).length;
     let userFinalResult = maxFinalResult - tracebackArray.length;
     if (tracebackArray) {
         for (let i = 0; i < tracebackArray.length; i++) {
-            tracebackAlert += `${tracebackArray[i]} \n `
+            tracebackAlert += `${tracebackArray[i]} \n`
         }
     }
     return [userFinalResult, tracebackAlert];
@@ -240,18 +280,27 @@ function outputResultTest(resultTest) {
     let [userFinalResult, tracebackAlert] = [resultTest[0], resultTest[1]];
     let maxFinalResult = Object.keys(dictionaryOfQuestions).length;
     if (tracebackAlert) {
-        let alertTestFailed = `Вы не правильно ответили на вопросы: \n \n ${tracebackAlert} \nВаш результат ${userFinalResult} из ${maxFinalResult}`
-        alert(alertTestFailed)
+        let errorDictionary = {
+            "tracebackAlert": tracebackAlert,
+            "userFinalResult": userFinalResult,
+            "maxFinalResult": maxFinalResult
+        }
+        allAlert('CC7', errorDictionary)
         return false;
     }
-    alert(`Ваш результат ${userFinalResult} из ${maxFinalResult}. Вы молодец!`)
+    let errorDictionary = {
+        "userFinalResult": userFinalResult,
+        "maxFinalResult": maxFinalResult
+    }
+    allAlert('CC5', errorDictionary)
 }
 
-// MAIN PROGRAM
+// Main Program
 
 function startTest() {
-    getInformationQuestion()
+    getQuestionFromDictionary()
     disabledButton()
+    addFinalButton();
 }
 
 function mainAddQuestion() {
@@ -276,3 +325,20 @@ function checkResult() {
         outputResultTest(resultTest)
     }
 }
+
+function startHtml() {
+    let label = "Добавить вопрос"
+    let onclick = mainAddQuestion
+    let id = "mainAddQuestion"
+    let buttonAddQuestion = createButton(label, onclick, id)
+
+    label = "Начать тест"
+    onclick = startTest
+    id = "startTest"
+    let buttonBeginTest = createButton(label, onclick, id)
+    let br = document.createElement("br");
+
+    document.body.append(buttonAddQuestion, buttonBeginTest, br)
+}
+
+startHtml()
